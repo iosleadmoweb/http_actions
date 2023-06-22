@@ -13,10 +13,16 @@ extension ResolveTypeHelpers on ResolveType {
 class HttpBaseOptions {
   String baseUrl;
   Map<String, String>? headers;
+  Duration timeOut;
+  bool showlogs;
 
-  HttpBaseOptions({required this.baseUrl, this.headers});
+  HttpBaseOptions(
+      {required this.baseUrl,
+      this.headers,
+      this.timeOut = const Duration(minutes: 5),
+      this.showlogs = true});
 
-  HttpBaseOptions initOptions() {
+  static HttpBaseOptions initOptions() {
     return HttpBaseOptions(
         baseUrl: "", headers: {"Authorization": "application/json"});
   }

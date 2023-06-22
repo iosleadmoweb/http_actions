@@ -6,3 +6,5 @@ export 'src/http_intercepter.dart';
 export 'src/http_options.dart';
 export 'src/http_response.dart';
 export 'src/http_helper.dart';
+export 'package:http_parser/http_parser.dart';
+export 'dart:typed_data';

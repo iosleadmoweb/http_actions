@@ -1,10 +1,10 @@
 import 'package:http_actions/http_actions.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 
 abstract class HttpActions {
   HttpActions();
 
-  late HttpBaseOptions options;
+  HttpBaseOptions? options;
 
   InterceptorsWrapper? interceptorsWrapper;
 
@@ -42,25 +42,25 @@ abstract class HttpActions {
     Map<String, String>? header,
   });
 
-  Future<HttpBaseResponse> onRequest(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Map<String, String>? header,
-    required HttpRequestNames requestName,
-  });
+  // Future<HttpBaseResponse> onRequest(
+  //   String path, {
+  //   Object? data,
+  //   Map<String, dynamic>? queryParameters,
+  //   Map<String, String>? header,
+  //   required HttpRequestNames requestName,
+  // });
 
-  Future<http.Response> fetchAPI({
-    Object? data,
-    required HttpRequestOption requestOption,
-    required HttpRequestNames requestName,
-  });
+  // Future<http.Response> fetchAPI({
+  //   Object? data,
+  //   required HttpRequestOption requestOption,
+  //   required HttpRequestNames requestName,
+  // });
 
-  Future<http.Response> multipartFetch({
-    required dynamic body,
-    required HttpRequestNames requestName,
-    required HttpRequestOption requestOption,
-  });
+  // Future<http.Response> multipartFetch({
+  //   required dynamic body,
+  //   required HttpRequestNames requestName,
+  //   required HttpRequestOption requestOption,
+  // });
 
   Future<void> download(String url,
       {required Function(int totalBytes, int receivedBytes) onDownloadProgress,

@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http_actions/http_actions.dart';
 import 'package:http/http.dart' as http;
 
 abstract class HttpActionMixin implements HttpActions {
   @override
-  late HttpBaseOptions options;
+  HttpBaseOptions? options;
 
   @override
   InterceptorsWrapper? interceptorsWrapper;
@@ -21,7 +22,7 @@ abstract class HttpActionMixin implements HttpActions {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? header,
   }) {
-    return onRequest(
+    return _onRequest(
       path,
       queryParameters: queryParameters,
       requestName: HttpRequestNames.GET,
@@ -34,8 +35,9 @@ abstract class HttpActionMixin implements HttpActions {
   Future<void> download(String url,
       {required Function(int totalBytes, int receivedBytes) onDownloadProgress,
       required Function(List<int> totalBytes) onDownloadDone}) async {
+    options ??= HttpBaseOptions.initOptions();
     //Get header which is are available in BaseOption
-    Map<String, String> allHeaders = options.headers ?? {};
+    Map<String, String> allHeaders = options!.headers ?? {};
 
     //Create RequestOption object with baseUrl, headers, path and queryParameters
     HttpRequestOption requestOption = HttpRequestOption(
@@ -92,7 +94,7 @@ abstract class HttpActionMixin implements HttpActions {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? header,
   }) {
-    return onRequest(path,
+    return _onRequest(path,
         queryParameters: queryParameters,
         requestName: HttpRequestNames.POST,
         header: header,
@@ -107,7 +109,7 @@ abstract class HttpActionMixin implements HttpActions {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? header,
   }) {
-    return onRequest(path,
+    return _onRequest(path,
         queryParameters: queryParameters,
         requestName: HttpRequestNames.PATCH,
         header: header,
@@ -122,7 +124,7 @@ abstract class HttpActionMixin implements HttpActions {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? header,
   }) {
-    return onRequest(path,
+    return _onRequest(path,
         queryParameters: queryParameters,
         requestName: HttpRequestNames.PUT,
         header: header,
@@ -137,7 +139,7 @@ abstract class HttpActionMixin implements HttpActions {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? header,
   }) {
-    return onRequest(path,
+    return _onRequest(path,
         queryParameters: queryParameters,
         requestName: HttpRequestNames.DELETE,
         header: header,
@@ -150,16 +152,17 @@ abstract class HttpActionMixin implements HttpActions {
   //[queryParameters] request queryParam
   //[header] request headers (If any perticular api need any extra header)
   //[requestName] identifire of request name
-  @override
-  Future<HttpBaseResponse> onRequest(
+  // @override
+  Future<HttpBaseResponse> _onRequest(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Map<String, String>? header,
     required HttpRequestNames requestName,
   }) async {
+    options ??= HttpBaseOptions.initOptions();
     //Get header which is are available in BaseOption
-    Map<String, String> allHeaders = options.headers ?? {};
+    Map<String, String> allHeaders = options!.headers ?? {};
     if (header != null) {
       //If extra header not null then should concet it
       allHeaders.addAll(header);
@@ -167,7 +170,7 @@ abstract class HttpActionMixin implements HttpActions {
 
     //Create RequestOption object with baseUrl, headers, path and queryParameters
     HttpRequestOption requestOption = HttpRequestOption(
-      baseUrl: options.baseUrl,
+      baseUrl: options!.baseUrl,
       headers: allHeaders,
       path: path,
       queryParam: queryParameters,
@@ -182,16 +185,26 @@ abstract class HttpActionMixin implements HttpActions {
     }
 
     //Call fetch api and get request response
-    http.Response apiResponse = await fetchAPI(
+    http.Response apiResponse = await _fetchAPI(
         requestName: requestName, requestOption: requestOption, data: data);
 
     //Create HttpResponseOption object with status, headers, path and baseUrl
     HttpResponseOption responseOption = HttpResponseOption(
-      baseUrl: options.baseUrl,
+      baseUrl: options!.baseUrl,
       path: path,
       statusCode: apiResponse.statusCode,
       headers: requestOption.headers,
     );
+
+    if (options!.showlogs) {
+      log("----------------Response----------------");
+      log("EndPoint");
+      log("${responseOption.baseUrl}${responseOption.path}");
+      log("Status Code");
+      log(apiResponse.statusCode.toString());
+      log("Data");
+      log(apiResponse.body.toString());
+    }
     try {
       //Create HttpBaseResponse object with apiResponse status code
       HttpBaseResponse httpResponse = HttpBaseResponse(
@@ -203,7 +216,7 @@ abstract class HttpActionMixin implements HttpActions {
       if (_inter != null && _inter?.onResponse != null) {
         responseOption = await _inter!.onResponse!(responseOption);
         if (responseOption.resolveType.isDoResolve) {
-          return await onRequest(path,
+          return await _onRequest(path,
               requestName: requestName,
               data: data,
               header: header,
@@ -230,8 +243,7 @@ abstract class HttpActionMixin implements HttpActions {
   }
 
   //Handel fetch api
-  @override
-  Future<http.Response> fetchAPI({
+  Future<http.Response> _fetchAPI({
     Object? data,
     required HttpRequestOption requestOption,
     required HttpRequestNames requestName,
@@ -239,7 +251,7 @@ abstract class HttpActionMixin implements HttpActions {
     // Check if data is map and data have containsValue http.MultipartFile then should call multipart request
     if (data is Map) {
       if (data.containsValue(http.MultipartFile)) {
-        return multipartFetch(
+        return _multipartFetch(
           body: data,
           requestName: requestName,
           requestOption: requestOption,
@@ -248,40 +260,58 @@ abstract class HttpActionMixin implements HttpActions {
     }
 
     // encode request data
-    final enCodedData = jsonEncode(data);
+    final enCodedData = data == null ? null : jsonEncode(data);
+
+    if (options!.showlogs) {
+      log("----------------Request----------------");
+      log("EndPoint");
+      log(requestOption.requestUrl.toString());
+      log("Header");
+      log(requestOption.headers.toString());
+      log("Data");
+      log(data.toString());
+    }
 
     // Check requestType and call appropriate request
     switch (requestName) {
       //Call Get request
       case HttpRequestNames.GET:
-        return await _client.get(requestOption.requestUrl,
-            headers: requestOption.headers);
+        return await _client
+            .get(requestOption.requestUrl, headers: requestOption.headers)
+            .timeout(options!.timeOut);
 
       //Call Post request
       case HttpRequestNames.POST:
-        return await _client.post(requestOption.requestUrl,
-            headers: requestOption.headers, body: enCodedData);
+        return await _client
+            .post(requestOption.requestUrl,
+                headers: requestOption.headers, body: enCodedData)
+            .timeout(options!.timeOut);
 
       //Call Patch request
       case HttpRequestNames.PATCH:
-        return await _client.patch(requestOption.requestUrl,
-            headers: requestOption.headers, body: enCodedData);
+        return await _client
+            .patch(requestOption.requestUrl,
+                headers: requestOption.headers, body: enCodedData)
+            .timeout(options!.timeOut);
 
       //Call Put request
       case HttpRequestNames.PUT:
-        return await _client.put(requestOption.requestUrl,
-            headers: requestOption.headers, body: enCodedData);
+        return await _client
+            .put(requestOption.requestUrl,
+                headers: requestOption.headers, body: enCodedData)
+            .timeout(options!.timeOut);
 
       //Call Delete request
       case HttpRequestNames.DELETE:
-        return await _client.delete(requestOption.requestUrl,
-            headers: requestOption.headers, body: enCodedData);
+        return await _client
+            .delete(requestOption.requestUrl,
+                headers: requestOption.headers, body: enCodedData)
+            .timeout(options!.timeOut);
     }
   }
 
   //Handle multipart request
-  @override
-  Future<http.Response> multipartFetch({
+  Future<http.Response> _multipartFetch({
     required dynamic body,
     required HttpRequestNames requestName,
     required HttpRequestOption requestOption,
