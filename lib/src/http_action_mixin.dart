@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:http_actions/http_actions.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 abstract class HttpActionMixin implements HttpActions {
   @override
@@ -184,6 +185,15 @@ abstract class HttpActionMixin implements HttpActions {
       );
     }
 
+    if (!(await CacheManagerPreference.instance.checkConnection())) {
+      var cachedFile = await CacheManagerPreference.instance.cacheManager
+          .getFileFromCache(requestOption.requestUrl.toString());
+      if (cachedFile != null) {
+        var cachedData = await cachedFile.file.readAsString();
+        return HttpBaseResponse.fromJson(json.decode(cachedData));
+      }
+    }
+
     //Call fetch api and get request response
     http.Response apiResponse = await _fetchAPI(
         requestName: requestName, requestOption: requestOption, data: data);
@@ -230,6 +240,25 @@ abstract class HttpActionMixin implements HttpActions {
       //If decoded string not empty then should decode with json and set that data to HttpBaseResponse object
       if (enCodedStr.isNotEmpty) {
         httpResponse.data = jsonDecode(enCodedStr);
+        //Check is there Web OR Not
+        // "flutter_cache_manager" did not support in web
+        if (!kIsWeb) {
+          //Check is enable cache data
+          if (options!.cacheDate) {
+            try {
+              //Store data to cache_manager
+              var byteList = utf8.encode(json.encode(httpResponse.toJson()));
+              var bytes = Uint8List.fromList(byteList);
+              await CacheManagerPreference.instance.cacheManager
+                  .putFile(requestOption.requestUrl.toString(), bytes);
+            } catch (e) {
+              if (options!.showlogs) {
+                log("----------------Cache Service----------------");
+                log(e.toString());
+              }
+            }
+          }
+        }
       }
       // Set responseOption to httpResponse
       httpResponse.responseOption = responseOption;

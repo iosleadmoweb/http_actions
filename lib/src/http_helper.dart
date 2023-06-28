@@ -9,6 +9,10 @@ enum HttpRequestNames {
   DELETE,
 }
 
+extension HttpRequestNamesHelpers on HttpRequestNames {
+  bool get isGet => this == HttpRequestNames.GET;
+}
+
 class MultipartFile {
   static Future<http.MultipartFile> fromPath(
       {required String filed,

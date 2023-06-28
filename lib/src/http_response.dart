@@ -10,4 +10,16 @@ class HttpBaseResponse {
   Object? data;
   int? statusCode;
   HttpResponseOption? responseOption;
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> jsonData = <String, dynamic>{};
+    jsonData["code"] = statusCode;
+    jsonData["data"] = data;
+    return jsonData;
+  }
+
+  HttpBaseResponse.fromJson(Map<String, dynamic> json) {
+    data = json["data"];
+    statusCode = json["code"];
+  }
 }
