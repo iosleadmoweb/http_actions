@@ -11,7 +11,7 @@ class HttpInstance with HttpActionMixin implements HttpActions {
     interceptorsWrapper = InterceptorsWrapper(
       onRequest: (options) async {
         if (options.path != "/login") {
-          options.cacheDate = true;
+          options.cacheData = true;
         }
         options.headers = {"Content-Type": "application/json"};
         return options;
