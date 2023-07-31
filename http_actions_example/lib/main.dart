@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http_actions_example/screens/login/login_page.dart';
+import 'package:http_actions_example/screens/product/products_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await HttpHiveService().init();
   runApp(const MyApp());
 }
 
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(),
+      home: const ProductsPage(),
     );
   }
 }
