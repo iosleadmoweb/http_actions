@@ -5,6 +5,16 @@ supports Global configuration, Interceptors, FormData,
 File uploading/downloading,
 Timeout, Cache Data etc. 
 
+## Why use this package?
+A powerful Flutter package for making HTTP requests with support for interceptors and caching with dynamic configuration.
+
+## Interceptors
+Interceptors are a powerful feature of our Flutter package that allow you to intercept and manipulate HTTP requests and responses before they are sent or received. With interceptors, you gain fine-grained control over the communication between your Flutter app and the server, enabling you to add authentication tokens, modify headers, log requests, or even implement caching strategies. Whether you need to enhance security, optimize network performance, or customize request handling, our package's interceptors provide a flexible and convenient solution for all your HTTP communication needs.
+
+## Cache
+Our Flutter package goes beyond traditional HTTP request handling by offering a seamless cache data flow. With our cache data flow, you can effortlessly store and retrieve HTTP responses, gracefully handling offline scenarios, our package's cache data flow empowers your Flutter app to provide a smoother user experience.
+
+
 ## Get started
 
 ### Add dependency
