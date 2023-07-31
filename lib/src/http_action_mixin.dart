@@ -244,7 +244,7 @@ abstract class HttpActionMixin implements HttpActions {
         // "flutter_cache_manager" did not support in web
         if (!kIsWeb) {
           //Check is enable cache data
-          if (options!.cacheDate) {
+          if (options!.cacheData) {
             try {
               //Store data to cache_manager
               var byteList = utf8.encode(json.encode(httpResponse.toJson()));
@@ -280,7 +280,7 @@ abstract class HttpActionMixin implements HttpActions {
     // Check if data is map and data have containsValue http.MultipartFile then should call multipart request
     if (data is Map) {
       if (data.containsValue(http.MultipartFile)) {
-        return _multipartFetch(
+        return await _multipartFetch(
           body: data,
           requestName: requestName,
           requestOption: requestOption,

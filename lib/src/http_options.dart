@@ -15,14 +15,14 @@ class HttpBaseOptions {
   Map<String, String>? headers;
   Duration timeOut;
   bool showlogs;
-  bool cacheDate;
+  bool cacheData;
 
   HttpBaseOptions(
       {required this.baseUrl,
       this.headers,
       this.timeOut = const Duration(minutes: 5),
       this.showlogs = true,
-      this.cacheDate = false});
+      this.cacheData = false});
 
   static HttpBaseOptions initOptions() {
     return HttpBaseOptions(
