@@ -4,12 +4,15 @@ version: 1.0.0
 repository: https://github.com/iosleadmoweb/http_actions.git
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
+  sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
+  flutter:
+    sdk: flutter
   http: ^0.13.6
   flutter_cache_manager: ^3.3.0
   connectivity_plus: ^4.0.1
+  http_parser: ^4.0.2
 
 dev_dependencies:
   lints: ^2.0.0
