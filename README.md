@@ -134,13 +134,16 @@ final response = await http_actions.post('/somePath', data: formData);
       baseUrl: "",
       showlogs: false,
       cacheData: true,
+      // Pass the common header for all requests
       headers: {},
+      // Add request timeout
       timeOut: const Duration(minutes: 5),
     );
     this.options = options;
     interceptorsWrapper = InterceptorsWrapper(
       onRequest: (options) async {
         options.cacheData = false;
+        //If you want to pass specific header for specific request then you should options.headers.
         options.headers = {
           "Authorization":""
         };
