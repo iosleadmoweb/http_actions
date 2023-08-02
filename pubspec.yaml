@@ -1,0 +1,19 @@
+name: http_actions
+description: A HTTP networking package for Dart/Flutter,supports Global configuration, Interceptors, FormData,File uploading/downloading,Timeout, Cache Data etc
+version: 1.0.1
+# repository: https://github.com/iosleadmoweb/http_actions.git
+
+environment:
+  sdk: ">=2.19.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.6
+  flutter_cache_manager: ^3.3.0
+  connectivity_plus: ^4.0.1
+  http_parser: ^4.0.2
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0
